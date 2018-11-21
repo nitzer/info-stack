@@ -24,7 +24,7 @@ db = client.stackdb
 app.json_encoder = JSONEncoder
 
 @app.route('/')
-def todo():
+def items():
     return render_template('index.html')
 
 @app.route('/get')
@@ -33,7 +33,6 @@ def get():
     for item in db.stackdb.find():
         items.append({
             '_id': item['_id'], 
-            'name' : item['name'], 
             'description': item['description'],
             'position': 0
             })
@@ -48,15 +47,15 @@ def update():
 def delete(id):
     return db.stackdb.delete_one({'_id': id})
 
-@app.route('/new', methods=['POST'])
-def new():
+@app.route('/add', methods=['POST'])
+def add():
     item_doc = {
-        'name': request.form['name'],
-        'description': request.form['description']
+        'description': request.form['description'],
+        'image': request.form['image']
     }
     response = db.stackdb.insert_one(item_doc)
 
-    return jsonify({'stat': 'ok'})
+    return jsonify({'stat': 'ok', '_id': response})
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=True)

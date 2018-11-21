@@ -1,5 +1,11 @@
 var app;
 $(function  () {
-  app = new App()
+  // Init App 
+  app = new App();
+  
+  // Handle events
+  handleEvents();
+
+  // Init third party items
   $(".item-list").sortable();
 });
