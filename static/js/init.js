@@ -1,7 +1,7 @@
 var app;
 $(function  () {
   // Init App 
-  app = new App();
+  itemApp = new ItemApp();
   
   // Handle events
   handleEvents();

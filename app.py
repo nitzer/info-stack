@@ -3,6 +3,8 @@ import json
 import datetime
 from flask import Flask, redirect, url_for, request, render_template, jsonify
 from bson.objectid import ObjectId
+from pprint import pprint
+from inspect import getmembers
 
 from pymongo import MongoClient
 
@@ -30,32 +32,72 @@ def items():
 @app.route('/get')
 def get():
     items = []
-    for item in db.stackdb.find():
-        items.append({
-            '_id': item['_id'], 
-            'description': item['description'],
-            'position': 0
-            })
+    try:
+        for item in db.stackdb.find():
+            items.append({
+                '_id': item['_id'], 
+                'description': item['description'],
+                'position': 0
+                })
+        
+        result = {'stat':'ok', 'items': items}
+    except Exception as e:
+        result = {'stat': 'nok', 'error': 'cannot get items'}
     # create a hash from the current list
-    return jsonify({'items': items})
+    return jsonify(result)
 
-@app.route('/update')
+@app.route('/update', methods=['POST'])
 def update():
-    return jsonify([])
+    try:
+        response = db.stackdb.update_one(
+            {
+                '_id': ObjectId(request.form['_id'])
+            },
+            {   '$set': {
+                    'description': request.form['description'], 
+                    'image': request.form['image']
+                }
+            }
+        )
+        if response.modified_count > 0:
+            result = {'stat': 'ok'}
+        else:
+            result = {'stat': 'nok', 'error': 'No item updated'}
 
-@app.route('/delete/<id>')
-def delete(id):
-    return db.stackdb.delete_one({'_id': id})
+    except Exception as e:
+        pprint(getmembers(e))
+        result = {'stat': 'nok', 'error': 'Error updating'}
+
+    return jsonify(result)
+
+@app.route('/delete', methods=['POST'])
+def delete():
+    try:
+        response = db.stackdb.delete_one({'_id': ObjectId(request.form['_id'])})
+        if response.deleted_count == 1 :
+            result = {'stat': 'ok'}
+        else:
+            result = {'stat': 'nok', 'error': 'item not found'}
+    except Exception as e:
+        result = {'stat': 'nok', 'error': 'error deleting'}
+
+    return jsonify(result)
+
 
 @app.route('/add', methods=['POST'])
 def add():
-    item_doc = {
-        'description': request.form['description'],
-        'image': request.form['image']
-    }
-    response = db.stackdb.insert_one(item_doc)
+    try:
+        item_doc = {
+            'description': request.form['description'],
+            'image': request.form['image']
+        }
+        new_object_id = db.stackdb.insert_one(item_doc).inserted_id
+        result = {'stat': 'ok', 'new_object_id': new_object_id}
 
-    return jsonify({'stat': 'ok', '_id': response})
+    except Exception as e:
+        result = {'stat': 'nok', 'error': 'cannot add new item'}
+
+    return jsonify(result)
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=True)
