@@ -1,4 +1,4 @@
-var app;
+var itemApp;
 $(function  () {
   // Init App 
   itemApp = new ItemApp();

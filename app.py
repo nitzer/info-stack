@@ -65,7 +65,6 @@ def update():
             result = {'stat': 'nok', 'error': 'No item updated'}
 
     except Exception as e:
-        pprint(getmembers(e))
         result = {'stat': 'nok', 'error': 'Error updating'}
 
     return jsonify(result)
