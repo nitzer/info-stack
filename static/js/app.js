@@ -427,7 +427,7 @@ class ItemApp{
 
         $(document).on("submit", "form", function(event){
             event.preventDefault();
-
+            console.log(this)
             var url=$(this).attr("action");
             $.ajax({
                 url: url,

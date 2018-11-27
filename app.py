@@ -33,7 +33,7 @@ app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
 })
 
 client = MongoClient(
-    '127.0.0.1', #os.environ['DB_PORT_27017_TCP_ADDR'],
+    os.environ['DB_PORT_27017_TCP_ADDR'],
     27017)
 db = client.stackdb
 app.json_encoder = JSONEncoder
