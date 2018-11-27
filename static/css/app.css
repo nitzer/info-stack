@@ -16,3 +16,7 @@ ol.example li.placeholder:before {
   position: absolute;
   /** Define arrowhead **/
 }
+
+.alert {
+    margin: 15px;
+}
